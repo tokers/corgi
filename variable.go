@@ -56,12 +56,12 @@ func (corgi *Corgi) variableGet(name string) (string, error) {
             return "", err
         }
 
-        if value.NotFound == true {
-            return "", fmt.Errorf("vlaue of variable \"%s\" not found", name)
-        }
-
         if value.Cacheable {
             corgi.caches[name] = &value
+        }
+
+        if value.NotFound == true {
+            return "", fmt.Errorf("vlaue of variable \"%s\" not found", name)
         }
 
         return value.Value, nil
