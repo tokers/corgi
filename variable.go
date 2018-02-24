@@ -33,8 +33,9 @@ type VariableValue struct {
 
 
 func (corgi *Corgi) validUnknownVariable(name string) *Variable {
-    /* FIXME implements with a more effective way(like trie?) */
     for prefix, variable := range corgi.unknowns {
+
+        /* FIXME implements with a more effective way(like trie?) */
         if strings.HasPrefix(name, prefix) == true {
             return variable
         }
@@ -93,18 +94,43 @@ func (corgi *Corgi) variableGet(name string) (string, error) {
 func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
     var name string = variable.Name
 
-    if oldVariable, ok := corgi.variables[name]; ok == true {
+    if variable.Flags & VARIABLE_UNKNOWN == 0 {
+        if oldVariable, ok := corgi.variables[name]; ok == true {
 
+            if oldVariable.Flags & VARIABLE_CHANGEABLE == 0 {
+                return fmt.Errorf("variable \"%s\" already exists", name)
+            }
+
+            /* flushes the cache */
+
+            delete(corgi.caches, name)
+        }
+
+        corgi.variables[name] = variable
+
+        return nil
+    }
+
+    /* unknown variables */
+
+    /* name is actually the prefix */
+    if oldVariable, ok := corgi.unknowns[name]; ok == true {
         if oldVariable.Flags & VARIABLE_CHANGEABLE == 0 {
             return fmt.Errorf("variable \"%s\" already exists", name)
         }
 
-        /* flushes the cache */
+        for key, _ := range corgi.caches {
 
-        delete(corgi.caches, name)
+            /* FIXME implements with a more effective way */
+            if strings.HasPrefix(key, name) == true {
+
+                /* flushes the cache */
+                delete(corgi.caches, key)
+            }
+        }
     }
 
-    corgi.variables[name] = variable
+    corgi.unknowns[name] = variable
 
     return nil
 }

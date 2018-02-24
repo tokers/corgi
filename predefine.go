@@ -33,6 +33,12 @@ var predefineVariables []*Variable = []*Variable {
         Get   : predefineVariablePWD,
         Flags : VARIABLE_CHANGEABLE,
     },
+
+    &Variable {
+        Name  : "env_",
+        Get   : predefineVariableENV,
+        Flags : VARIABLE_UNKNOWN,
+    },
 }
 
 
@@ -84,6 +90,23 @@ func predefineVariablePWD(value *VariableValue, _ interface{}, _ string) error {
     }
 
     value.NotFound = false
+
+    return nil
+}
+
+
+func predefineVariableENV(value *VariableValue, _ interface{}, key string) error {
+    val := os.Getenv(key)
+
+    value.Cacheable = false
+
+    if val == "" {
+        value.NotFound = true
+
+    } else {
+        value.NotFound = false
+        value.Value = val
+    }
 
     return nil
 }
