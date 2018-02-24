@@ -5,6 +5,7 @@ package corgi
 import (
     "fmt"
     "time"
+    "errors"
     "strconv"
     "testing"
 )
@@ -52,6 +53,11 @@ var variables []*Variable = []*Variable {
         Name  : "while_",
         Get   : variableGet,
     },
+
+    &Variable {
+        Name  : "error",
+        Get   : variableGetError,
+    },
 }
 
 
@@ -95,6 +101,27 @@ func variableGet(value *VariableValue, _ interface{}, name string) error {
 
     value.NotFound = true
 
+    return nil
+}
+
+
+func variableGetError(_ *VariableValue, _ interface{}, _ string) error {
+    return errors.New("intentional error")
+}
+
+
+func variableUnknownFirst(value *VariableValue, _ interface{}, _ string) error {
+    value.Value = "first"
+    value.NotFound = false
+    value.Cacheable = true
+    return nil
+}
+
+
+func variableUnknownSecond(value *VariableValue, _ interface{}, _ string) error {
+    value.Value = "second"
+    value.NotFound = false
+    value.Cacheable = true
     return nil
 }
 
@@ -280,6 +307,36 @@ func testVariableChange(t *testing.T) {
     if plain != 174 {
         t.Fatalf("incorrect value, expected \"174\" but seen \"%d\"", plain)
     }
+
+    err = c.RegisterNewVariable(&Variable {
+        Name  : "unknown_",
+        Get   : variableUnknownFirst,
+        Flags : VARIABLE_CHANGEABLE|VARIABLE_UNKNOWN,
+    })
+
+    if err != nil {
+        t.Fatalf("failed to register new variable: %s", err.Error())
+    }
+
+    data := parse(t, c, "${unknown_hahaha}${unknown_hohoho}")
+    if data != "firstfirst" {
+        t.Fatalf("incorrect value, expected \"firstfirst\" but seen \"%s\"", data)
+    }
+
+    err = c.RegisterNewVariable(&Variable {
+        Name  : "unknown_",
+        Get   : variableUnknownSecond,
+        Flags : VARIABLE_CHANGEABLE|VARIABLE_UNKNOWN,
+    })
+
+    if err != nil {
+        t.Fatalf("failed to register new variable: %s", err.Error())
+    }
+
+    data = parse(t, c, "${unknown_hahaha}${unknown_hohoho}")
+    if data != "secondsecond" {
+        t.Fatalf("incorrect value, expected \"secondsecond\" but seen \"%s\"", data)
+    }
 }
 
 
@@ -340,9 +397,37 @@ func testVariableValueNotFound(t *testing.T) {
 }
 
 
+func testVariableError(t *testing.T) {
+    c, err := New()
+    if err != nil {
+        t.Fatal("failed to create corgi instance failed")
+    }
+
+    if err := c.RegisterNewVariables(variables); err != nil {
+        t.Fatalf("failed to register new variables: %s", err.Error())
+    }
+
+    plain := "${error}"
+
+    if cv, err := c.Parse(plain); err != nil {
+        t.Fatalf("failed to parse plain string to corgi complex value: %s",
+                 err.Error())
+
+    } else {
+        if _, err := c.Code(cv); err == nil {
+            t.Fatal("unexpected successful parsing")
+
+        } else if err.Error() != "intentional error" {
+            t.Fatalf("unknown failure reason: %s", err.Error())
+        }
+    }
+}
+
+
 func TestVariable(t *testing.T) {
     testVariableRegister(t)
     testVariableCache(t)
     testVariableChange(t)
     testVariableValueNotFound(t)
+    testVariableError(t)
 }

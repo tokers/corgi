@@ -59,6 +59,26 @@ func testParseFailed(t *testing.T) {
     } else if err.Error() != errorReason {
         t.Fatalf("unknown failure reason: %s", err.Error())
     }
+
+    plain = "hello ${pP0}$"
+    errorReason = "unknown variable \"pP0\""
+
+    if _, err := c.Parse(plain); err == nil {
+        t.Fatal("unexpected successful parsing")
+
+    } else if err.Error() != errorReason {
+        t.Fatalf("unknown failure reason: %s", err.Error())
+    }
+
+    plain = "hello $pP0"
+    errorReason = "unknown variable \"pP0\""
+
+    if _, err := c.Parse(plain); err == nil {
+        t.Fatal("unexpected successful parsing")
+
+    } else if err.Error() != errorReason {
+        t.Fatalf("unknown failure reason: %s", err.Error())
+    }
 }
 
 
