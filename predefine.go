@@ -36,7 +36,7 @@ var predefineVariables []*Variable = []*Variable {
 }
 
 
-func predefineVariableHostname(value *VariableValue, _, _ interface{}) error {
+func predefineVariableHostname(value *VariableValue, _ interface{}, _ string) error {
     if name, err := os.Hostname(); err != nil {
         value.NotFound = true
         value.Cacheable = false
@@ -52,7 +52,7 @@ func predefineVariableHostname(value *VariableValue, _, _ interface{}) error {
 }
 
 
-func predefineVariableTimeLocal(value *VariableValue, _, _ interface{}) error {
+func predefineVariableTimeLocal(value *VariableValue, _ interface{}, _ string) error {
     value.Value = time.Now().Format("02/Jan/2006:15:04:05 -0700")
     value.Cacheable = false
     value.NotFound = false
@@ -61,7 +61,7 @@ func predefineVariableTimeLocal(value *VariableValue, _, _ interface{}) error {
 }
 
 
-func predefineVariablePID(value *VariableValue, _, _ interface{}) error {
+func predefineVariablePID(value *VariableValue, _ interface{}, _ string) error {
     pid := os.Getpid()
     value.Value = strconv.Itoa(pid)
 
@@ -72,7 +72,7 @@ func predefineVariablePID(value *VariableValue, _, _ interface{}) error {
 }
 
 
-func predefineVariablePWD(value *VariableValue, _, _ interface{}) error {
+func predefineVariablePWD(value *VariableValue, _ interface{}, _ string) error {
     value.Cacheable = false
 
     if dir, err := os.Getwd(); err != nil {

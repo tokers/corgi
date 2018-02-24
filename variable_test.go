@@ -16,42 +16,35 @@ var flag = false
 var variables []*Variable = []*Variable {
     &Variable {
         Name  : "name",
-        Data  : "name",
         Get   : variableGet,
         Flags : VARIABLE_CHANGEABLE,
     },
 
     &Variable {
         Name  : "gender",
-        Data  : "gender",
         Get   : variableGet,
         Flags : VARIABLE_CHANGEABLE,
     },
 
     &Variable {
         Name  : "height",
-        Data  : "height",
         Get   : variableGetCacheable,
         Flags : VARIABLE_CHANGEABLE,
     },
 
     &Variable {
         Name  : "weight",
-        Data  : "weight",
         Get   : variableGet,
     },
 
     &Variable {
         Name  : "none",
-        Data  : "none",
         Get   : variableGetCacheable,
     },
 }
 
 
-func variableGet(value *VariableValue, _, data interface{}) error {
-    name := data.(string)
-
+func variableGet(value *VariableValue, _ interface{}, name string) error {
     if name == "name" {
         value.NotFound = false
         value.Cacheable = false
@@ -88,9 +81,7 @@ func variableGet(value *VariableValue, _, data interface{}) error {
 }
 
 
-func variableGetCacheable(value *VariableValue, _, data interface{}) error {
-    name := data.(string)
-
+func variableGetCacheable(value *VariableValue, _ interface{}, name string) error {
     if name == "height" {
         count++
 
@@ -135,7 +126,6 @@ func testVariableRegister(t *testing.T) {
 
     err = c.RegisterNewVariable(&Variable {
         Name  : "weight",
-        Data  : "weight",
         Get   : variableGet,
     })
 
@@ -211,7 +201,6 @@ func testVariableChange(t *testing.T) {
 
     err = c.RegisterNewVariable(&Variable {
         Name  : "height",
-        Data  : "height",
         Get   : variableGet,
         Flags : VARIABLE_CHANGEABLE,
     })

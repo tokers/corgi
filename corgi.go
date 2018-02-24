@@ -10,6 +10,7 @@ const (
 
 type Corgi struct {
     variables map[string]*Variable
+    unknowns  map[string]*Variable
     caches    map[string]*VariableValue
     Context   interface{}
 }
@@ -19,7 +20,8 @@ func New() (*Corgi, error) {
     var corgi *Corgi = new(Corgi)
 
     corgi.variables = make(map[string]*Variable, VARIABLE_SLOTS)
-    corgi.caches    = make(map[string]*VariableValue, VARIABLE_SLOTS)
+    corgi.unknowns = make(map[string]*Variable, VARIABLE_SLOTS >> 1)
+    corgi.caches = make(map[string]*VariableValue, VARIABLE_SLOTS)
 
     if err := corgi.registerPredefineVariables(); err != nil {
         return nil, err

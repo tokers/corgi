@@ -4,23 +4,24 @@ package corgi
 
 import (
     "fmt"
+    "strings"
 )
 
 
 const (
     VARIABLE_NO_CACHEABLE = (1 << iota)
     VARIABLE_CHANGEABLE
+    VARIABLE_UNKNOWN
 )
 
 
-type VariableSetHandler func(value *VariableValue, ctx, data interface{}) error
-type VariableGetHandler func(value *VariableValue, ctx, data interface{}) error
+type VariableSetHandler func(value *VariableValue, ctx interface{}, name string) error
+type VariableGetHandler func(value *VariableValue, ctx interface{}, name string) error
 
 type Variable struct {
     Name   string
     Set    VariableSetHandler
     Get    VariableGetHandler
-    Data   interface{}
     Flags  uint
 }
 
@@ -31,41 +32,61 @@ type VariableValue struct {
 }
 
 
-func (corgi *Corgi) variableGet(name string) (string, error) {
-    var value VariableValue
-
-    if variable, ok := corgi.variables[name]; ok == false {
-        return "", fmt.Errorf("variable \"%s\" not found", name)
-
-    } else {
-        if (variable.Flags & VARIABLE_NO_CACHEABLE) == 0 {
-            if value, ok := corgi.caches[name]; ok == true {
-                /* hits the cache */
-                if value.NotFound == true {
-                    return "", fmt.Errorf("vlaue of variable \"%s\" not found",
-                                          name)
-                }
-
-                return value.Value, nil
-            }
+func (corgi *Corgi) validUnknownVariable(name string) *Variable {
+    /* FIXME implements with a more effective way(like trie?) */
+    for prefix, variable := range corgi.unknowns {
+        if strings.HasPrefix(name, prefix) == true {
+            return variable
         }
-
-        ctx := corgi.Context
-
-        if err := variable.Get(&value, ctx, variable.Data); err != nil {
-            return "", err
-        }
-
-        if value.Cacheable {
-            corgi.caches[name] = &value
-        }
-
-        if value.NotFound == true {
-            return "", fmt.Errorf("vlaue of variable \"%s\" not found", name)
-        }
-
-        return value.Value, nil
     }
+
+    return nil
+}
+
+
+func (corgi *Corgi) variableGet(name string) (string, error) {
+    var value     VariableValue
+    var variable *Variable
+    var ok        bool
+
+    var varName   string = name
+
+    if variable, ok = corgi.variables[name]; ok == false {
+        if variable = corgi.validUnknownVariable(name); variable == nil {
+            return "", fmt.Errorf("variable \"%s\" not found", name)
+        }
+
+        prefix := len(name)
+        varName = name[prefix:]
+    }
+
+    if (variable.Flags & VARIABLE_NO_CACHEABLE) == 0 {
+        if value, ok := corgi.caches[name]; ok == true {
+            /* hits the cache */
+            if value.NotFound == true {
+                return "", fmt.Errorf("vlaue of variable \"%s\" not found",
+                name)
+            }
+
+            return value.Value, nil
+        }
+    }
+
+    ctx := corgi.Context
+
+    if err := variable.Get(&value, ctx, varName); err != nil {
+        return "", err
+    }
+
+    if value.Cacheable {
+        corgi.caches[name] = &value
+    }
+
+    if value.NotFound == true {
+        return "", fmt.Errorf("vlaue of variable \"%s\" not found", name)
+    }
+
+    return value.Value, nil
 }
 
 

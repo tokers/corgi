@@ -72,7 +72,11 @@ func (cv *ComplexValue) append(name string, variable bool) error {
     /* this is a variable */
 
     if _, ok := cv.corgi.variables[name]; ok == false {
-        return fmt.Errorf("unknown variable \"%s\"", name)
+
+        /* is the unknown variable? */
+        if variable := cv.corgi.validUnknownVariable(name); variable == nil {
+            return fmt.Errorf("unknown variable \"%s\"", name)
+        }
     }
 
     cv.code = append(cv.code, scriptCode {
