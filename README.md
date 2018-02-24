@@ -3,6 +3,8 @@ Name
 
 Corgi - Implements the interpolation in Golang
 
+![Build Status](https://travis-ci.org/tokers/corgi.svg?branch=master)
+
 Table of Contents
 =================
 * [name](#name)
