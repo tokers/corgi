@@ -89,7 +89,6 @@ func (cv *ComplexValue) append(name string, variable bool) error {
 func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
     state   := PARSE_PLAIN
     from    := 0
-    to      := -1
     bracket := false
 
     var cv *ComplexValue = new(ComplexValue)
@@ -103,18 +102,14 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
         case PARSE_PLAIN:
 
             if ch != VARIABLE_PREFACE {
-                to++
                 continue
             }
 
             state = PARSE_VARIABLE_PREFACE
 
-            if err := cv.append(text[from:to+1], false); err != nil {
+            if err := cv.append(text[from:i], false); err != nil {
                 return nil, err
             }
-
-            /* reset */
-            from = i + 1
 
         case PARSE_VARIABLE_PREFACE:
 
@@ -126,8 +121,6 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
                 from = i
             }
 
-            to = i
-
             state = PARSE_VARIABLE
 
         case PARSE_VARIABLE:
@@ -136,34 +129,36 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
                 state = PARSE_PLAIN
                 bracket = false
 
-                if err := cv.append(text[from:to+1], true); err != nil {
+                if err := cv.append(text[from:i], true); err != nil {
                     return nil, err
                 }
 
                 from = i + 1
-                to = i
 
                 continue
             }
 
             if isValidVariableCharacter(ch) {
-                to++
                 continue
             }
 
             if bracket == true {
-                return nil, fmt.Errorf("\"}\" in \"%s\" is missing",
-                                       text[from:to])
+                return nil, fmt.Errorf("\"}\" for variable \"%s\" is missing",
+                                       text[from:i])
             }
 
-            state = PARSE_PLAIN
-
-            if err := cv.append(text[from:to+1], true); err != nil {
+            if err := cv.append(text[from:i], true); err != nil {
                 return nil, err
             }
 
+            if ch == VARIABLE_PREFACE {
+                state = PARSE_VARIABLE_PREFACE
+
+            } else {
+                state = PARSE_PLAIN
+            }
+
             from = i
-            to = i
         }
     }
 
@@ -175,8 +170,8 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
         return nil, errors.New("unexpected end of string, \"}\" is missing")
     }
 
-    if from <= to {
-        err := cv.append(text[from:to+1], state == PARSE_VARIABLE)
+    if from < len(text) {
+        err := cv.append(text[from:], state == PARSE_VARIABLE)
         if err != nil {
             return nil, err
         }
