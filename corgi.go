@@ -3,6 +3,11 @@
 package corgi
 
 
+const (
+    VARIABLE_SLOTS = 16
+)
+
+
 type Corgi struct {
     variables map[string]*Variable
     caches    map[string]*VariableValue
@@ -10,11 +15,11 @@ type Corgi struct {
 }
 
 
-func New(slot uint) (*Corgi, error) {
+func New() (*Corgi, error) {
     var corgi *Corgi = new(Corgi)
 
-    corgi.variables = make(map[string]*Variable, slot)
-    corgi.caches    = make(map[string]*VariableValue, slot)
+    corgi.variables = make(map[string]*Variable, VARIABLE_SLOTS)
+    corgi.caches    = make(map[string]*VariableValue, VARIABLE_SLOTS)
 
     if err := corgi.registerPredefineVariables(); err != nil {
         return nil, err
