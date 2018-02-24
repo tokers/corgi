@@ -110,7 +110,7 @@ func testPWD(t *testing.T, c *Corgi) {
 func TestPredefine(t *testing.T) {
     c, err := New()
     if err != nil {
-        t.Fatal("create corgi instance failed")
+        t.Fatal("failed to create corgi instance failed")
     }
 
     testPID(t, c)
