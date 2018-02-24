@@ -114,19 +114,19 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
             }
 
             /* reset */
-            from = to + 1
+            from = i + 1
 
         case PARSE_VARIABLE_PREFACE:
 
             if ch == VARIABLE_LBRACKET {
                 bracket = true
                 from = i + 1
-                to = i
 
             } else {
                 from = i
-                to = i
             }
+
+            to = i
 
             state = PARSE_VARIABLE
 
@@ -140,7 +140,8 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
                     return nil, err
                 }
 
-                from = to + 1
+                from = i + 1
+                to = i
 
                 continue
             }
@@ -161,7 +162,8 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
                 return nil, err
             }
 
-            from = to + 1
+            from = i
+            to = i
         }
     }
 

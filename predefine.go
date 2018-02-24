@@ -53,7 +53,7 @@ func predefineVariableHostname(value *VariableValue, _, _ interface{}) error {
 
 
 func predefineVariableTimeLocal(value *VariableValue, _, _ interface{}) error {
-    value.Value = time.Now().Format("02/Mon/2006:15:04:05 -0700")
+    value.Value = time.Now().Format("02/Jan/2006:15:04:05 -0700")
     value.Cacheable = false
     value.NotFound = false
 
