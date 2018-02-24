@@ -72,10 +72,10 @@ func testParseComplex(t *testing.T) {
         t.Fatalf("failed to register new variables: %s", err.Error())
     }
 
-    text := `Hello, This is ${name}, Host is $hostname,
+    text := `Hello, This is ${name}, dollar is $$, Host is $hostname,
              This is welsh corgi, 世界，你好, gender is $gender`
 
-    expected := `Hello, This is alex, Host is Fedora26-64,
+    expected := `Hello, This is alex, dollar is $, Host is Fedora26-64,
              This is welsh corgi, 世界，你好, gender is male`
 
     plain := parse(t, c, text)

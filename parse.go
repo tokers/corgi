@@ -123,6 +123,12 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
 
             } else {
                 from = i
+
+                /* $$ */
+                if ch == VARIABLE_PREFACE {
+                    state = PARSE_PLAIN
+                    continue
+                }
             }
 
             state = PARSE_VARIABLE

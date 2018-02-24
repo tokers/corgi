@@ -169,10 +169,6 @@ func testVariableRegister(t *testing.T) {
         t.Fatalf("unknown failure reason: %s", err.Error())
     }
 
-    if err != nil {
-        t.Fatalf("failed to register variable \"nil\": %s", err.Error())
-    }
-
     /* the old "nil" is known, replaces it with the unknown one */
     err = c.RegisterNewVariable(&Variable {
         Name : "nil",
