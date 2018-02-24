@@ -77,6 +77,10 @@ func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
         if oldVariable.Flags & VARIABLE_CHANGEABLE == 0 {
             return fmt.Errorf("variable \"%s\" already exists", name)
         }
+
+        /* flushes the cache */
+
+        delete(corgi.caches, name)
     }
 
     corgi.variables[name] = variable
