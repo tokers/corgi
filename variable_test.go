@@ -41,6 +41,17 @@ var variables []*Variable = []*Variable {
         Name  : "none",
         Get   : variableGetCacheable,
     },
+
+    &Variable {
+        Name  : "nil",
+        Get   : variableGetCacheable,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "while_",
+        Get   : variableGet,
+    },
 }
 
 
@@ -72,6 +83,13 @@ func variableGet(value *VariableValue, _ interface{}, name string) error {
         value.NotFound = false
         value.Cacheable = false
         value.Value = strconv.Itoa(170 + count)
+        return nil
+    }
+
+    if name == "hahah" {
+        value.NotFound = false
+        value.Cacheable = false
+        value.Value = "hihihi"
         return nil
     }
 
@@ -135,6 +153,46 @@ func testVariableRegister(t *testing.T) {
 
     if err.Error() != "variable \"weight\" already exists" {
         t.Fatalf("unknown failure reason: %s", err.Error())
+    }
+
+    err = c.RegisterNewVariable(&Variable {
+        Name : "while_",
+        Get : variableGet,
+        Flags : VARIABLE_UNKNOWN,
+    })
+
+    if err == nil {
+        t.Fatalf("unexpected successful register")
+    }
+
+    if err.Error() != "variable \"while_\" already exists" {
+        t.Fatalf("unknown failure reason: %s", err.Error())
+    }
+
+    if err != nil {
+        t.Fatalf("failed to register variable \"nil\": %s", err.Error())
+    }
+
+    /* the old "nil" is known, replaces it with the unknown one */
+    err = c.RegisterNewVariable(&Variable {
+        Name : "nil",
+        Get : variableGet,
+        Flags : VARIABLE_UNKNOWN|VARIABLE_CHANGEABLE,
+    })
+
+    if err != nil {
+        t.Fatalf("failed to register variable \"nil\": %s", err.Error())
+    }
+
+    /* the old "nil" is unknown, replaces it with the known one */
+    err = c.RegisterNewVariable(&Variable {
+        Name : "nil",
+        Get : variableGet,
+        Flags : VARIABLE_CHANGEABLE,
+    })
+
+    if err != nil {
+        t.Fatalf("failed to register variable \"nil\": %s", err.Error())
     }
 
     timeLocal := time.Now().Format("02/Jan/2006:15:04:05 -0700")
@@ -258,6 +316,28 @@ func testVariableValueNotFound(t *testing.T) {
             t.Fatal("unexpected successful parsing")
 
         } else if err.Error() != "vlaue of variable \"none\" not found" {
+            t.Fatalf("unknown failure reason: %s", err.Error())
+        }
+    }
+
+    plain = "${env_xxxxx}"
+    if cv, err := c.Parse(plain); err != nil {
+        t.Fatalf("failed to parse plain string to corgi complex value: %s",
+                 err.Error())
+
+    } else {
+        if _, err := c.Code(cv); err == nil {
+            t.Fatal("unexpected successful parsing")
+
+        } else if err.Error() != "vlaue of variable \"env_xxxxx\" not found" {
+            t.Fatalf("unknown failure reason: %s", err.Error())
+        }
+
+        /* not found from the cache */
+        if _, err := c.Code(cv); err == nil {
+            t.Fatal("unexpected successful parsing")
+
+        } else if err.Error() != "vlaue of variable \"env_xxxxx\" not found" {
             t.Fatalf("unknown failure reason: %s", err.Error())
         }
     }

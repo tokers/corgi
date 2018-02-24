@@ -28,6 +28,25 @@ func parse(t *testing.T, c *Corgi, plain string) string {
 }
 
 
+func testENV(t *testing.T, c *Corgi) {
+    path := fmt.Sprintf("The PATH is %s", os.Getenv("PATH"))
+
+    data := parse(t, c, "The PATH is $env_PATH")
+    if data != path {
+        t.Fatalf("incorrect value, expected \"%s\" but seen \"%s\"",
+                 path, data)
+    }
+
+    path = fmt.Sprintf("The GOPATH is %s", os.Getenv("GOPATH"))
+
+    data = parse(t, c, "The GOPATH is $env_GOPATH")
+    if data != path {
+        t.Fatalf("incorrect value, expected \"%s\" but seen \"%s\"",
+                 path, data)
+    }
+}
+
+
 func testPID(t *testing.T, c *Corgi) {
     pid := fmt.Sprintf("The process pid is %d", os.Getpid())
 
@@ -117,4 +136,5 @@ func TestPredefine(t *testing.T) {
     testHostname(t, c)
     testTimeLocal(t, c)
     testPWD(t, c)
+    testENV(t, c)
 }
