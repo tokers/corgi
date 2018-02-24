@@ -49,6 +49,10 @@ func isValidVariableCharacter(ch rune) bool {
         return true
     }
 
+    if ch == '_' {
+        return true
+    }
+
     return false
 }
 
@@ -61,6 +65,8 @@ func (cv *ComplexValue) append(name string, variable bool) error {
         })
 
         cv.size++
+
+        return nil
     }
 
     /* this is a variable */
@@ -115,9 +121,12 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
             if ch == VARIABLE_LBRACKET {
                 bracket = true
                 from = i + 1
-            }
+                to = i
 
-            to++
+            } else {
+                from = i
+                to = i
+            }
 
             state = PARSE_VARIABLE
 
@@ -138,6 +147,7 @@ func (corgi *Corgi) Parse(text string) (*ComplexValue, error) {
 
             if isValidVariableCharacter(ch) {
                 to++
+                continue
             }
 
             if bracket == true {
