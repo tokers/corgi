@@ -123,7 +123,7 @@ func predefineVariableTime(value *VariableValue, _ interface{}, component string
             value.Value = "Wed"
 
         case time.Thursday:
-            value.Value = "Thur"
+            value.Value = "Thu"
 
         case time.Friday:
             value.Value = "Fri"

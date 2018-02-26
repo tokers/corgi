@@ -49,7 +49,7 @@ func testTime(t *testing.T, c *Corgi) {
         week = "Wed"
 
     case time.Thursday:
-        week = "Thur"
+        week = "Thu"
 
     case time.Friday:
         week = "Fri"
