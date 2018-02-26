@@ -162,7 +162,7 @@ Types
 
 ```go
 type Corgi struct {
-	Context   interface{}
+    Context   interface{}
     // contains filtered or unexported fields
 }
 ```
@@ -276,7 +276,7 @@ The package corgi contains some pre-defined variables.
 * `$year`, current year(numeric form)
 * `$month`, current month(numeric form)
 * `$day`, current day(numeric form)
-* `$week`, current weekday in textual form(abbrv)
+* `$week`, current weekday in textual form(abbrev)
     * `Sun`
     * `Mon`
     * `Tue`
