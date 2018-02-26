@@ -273,6 +273,20 @@ The package corgi contains some pre-defined variables.
 * `$time_local`, current time in the form of [common log format](https://en.wikipedia.org/wiki/Common_Log_Format)
 * `$pid`, the process id of the caller
 * `$pwd`, the working directory of the caller process
+* `$year`, current year(numeric form)
+* `$month`, current month(numeric form)
+* `$day`, current day(numeric form)
+* `$week`, current weekday in textual form(abbrv)
+    * `Sun`
+    * `Mon`
+    * `Tue`
+    * `Wed`
+    * `Thu`
+    * `Fri`
+    * `Sat`
+* `$hour`, current hour(numeric form)
+* `$minute`, current minute(numeric form)
+* `$second`, current second(numeric form)
 * `$env_NAME`, the environment variables, e.g. `$env_PATH`, `$env_HOME`
 
 Auther
@@ -285,6 +299,7 @@ TODO
 
 * regex capture group variables
 * methods for flushing vairable caches
+* controls the width of variable value
 
 Copyright and License
 =====================
