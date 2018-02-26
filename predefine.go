@@ -35,10 +35,135 @@ var predefineVariables []*Variable = []*Variable {
     },
 
     &Variable {
+        Name  : "year",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "month",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "week",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "day",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "hour",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "minute",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "zone",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
+        Name  : "second",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
         Name  : "env_",
         Get   : predefineVariableENV,
         Flags : VARIABLE_UNKNOWN,
     },
+}
+
+
+func predefineVariableTime(value *VariableValue, _ interface{}, component string) error {
+    now := time.Now()
+
+    value.NotFound = false
+    value.Cacheable = false
+
+    if component == "year" {
+        value.Value = strconv.Itoa(now.Year())
+        return nil
+    }
+
+    if component == "month" {
+        value.Value = strconv.Itoa(int(now.Month()))
+        return nil
+    }
+
+    if component == "week" {
+        week := now.Weekday()
+        switch (week) {
+
+        case time.Sunday:
+            value.Value = "Sun"
+
+        case time.Monday:
+            value.Value = "Mon"
+
+        case time.Tuesday:
+            value.Value = "Tue"
+
+        case time.Wednesday:
+            value.Value = "Wed"
+
+        case time.Thursday:
+            value.Value = "Thur"
+
+        case time.Friday:
+            value.Value = "Fri"
+
+        default:
+            value.Value = "Sat"
+        }
+
+        return nil
+    }
+
+    if component == "day" {
+        value.Value = strconv.Itoa(now.Day())
+        return nil
+    }
+
+    if component == "hour" {
+        value.Value = strconv.Itoa(now.Hour())
+        return nil
+    }
+
+    if component == "minute" {
+        value.Value = strconv.Itoa(now.Minute())
+        return nil
+    }
+
+    if component == "second" {
+        value.Value = strconv.Itoa(now.Second())
+        return nil
+    }
+
+    if component == "zone" {
+        value.Value, _ = now.Zone()
+        return nil
+    }
+
+    value.NotFound = true
+    value.Cacheable = true
+
+    return nil
 }
 
 

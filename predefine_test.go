@@ -6,6 +6,8 @@ import (
     "os"
     "fmt"
     "time"
+    "math"
+    "strconv"
     "testing"
 )
 
@@ -25,6 +27,68 @@ func parse(t *testing.T, c *Corgi, plain string) string {
     }
 
     return ""
+}
+
+
+func testTime(t *testing.T, c *Corgi) {
+    now := time.Now()
+    var week string
+
+    switch (now.Weekday()) {
+
+    case time.Sunday:
+        week = "Sun"
+
+    case time.Monday:
+        week = "Mon"
+
+    case time.Tuesday:
+        week = "Tue"
+
+    case time.Wednesday:
+        week = "Wed"
+
+    case time.Thursday:
+        week = "Thur"
+
+    case time.Friday:
+        week = "Fri"
+
+    default:
+        week = "Sat"
+    }
+
+    expected := fmt.Sprintf("%d%d%d%s%d", now.Year(), int(now.Month()),
+                            now.Day(), week, now.Hour())
+    data := parse(t, c, "$year$month$day$week$hour")
+    if data != expected {
+        t.Fatalf("incorrect value, expected \"%s\" but seen \"%s\"", expected,
+                 data)
+    }
+
+    min, err := strconv.Atoi(parse(t, c, "$minute"))
+    if err != nil {
+        t.Fatalf("failed to convert $minute to integer: %s", err.Error())
+    }
+
+    if math.Abs(float64(min - now.Minute())) > 1 {
+        t.Fatalf("incorrect minute: %d", data)
+    }
+
+    _, err = strconv.Atoi(parse(t, c, "$second"))
+    if err != nil {
+        t.Fatalf("failed to convert $second to integer: %s", err.Error())
+    }
+
+    /* we assume that the second value is correct */
+
+    realZone, _ := now.Zone()
+
+    zone := parse(t, c, "${zone}")
+    if realZone != zone {
+        t.Fatalf("incorrect zone, expected \"%s\" but seen \"%s\"", realZone,
+                 zone)
+    }
 }
 
 
@@ -137,4 +201,5 @@ func TestPredefine(t *testing.T) {
     testTimeLocal(t, c)
     testPWD(t, c)
     testENV(t, c)
+    testTime(t, c)
 }
