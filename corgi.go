@@ -1,4 +1,4 @@
-/* Copyright (C) Alex Zhang */
+// Copyright (C) Alex Zhang
 
 package corgi
 
@@ -8,6 +8,9 @@ const (
 )
 
 
+// Corgi is the core struct for user.
+// The field Context, holds any type data that the caller wants to save,
+// which will be used inside the variable get/set handler.
 type Corgi struct {
     variables map[string]*Variable
     unknowns  map[string]*Variable
@@ -16,6 +19,9 @@ type Corgi struct {
 }
 
 
+// New returns an instance of Corgi.
+// In case of failure, nil and the corresponding error object will be yielded.
+// In case of success, the error object will be nil.
 func New() (*Corgi, error) {
     var corgi *Corgi = new(Corgi)
 

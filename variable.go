@@ -1,4 +1,4 @@
-/* Copyright (C) Alex Zhang */
+// Copyright (C) Alex Zhang
 
 package corgi
 
@@ -18,6 +18,12 @@ const (
 type VariableSetHandler func(value *VariableValue, ctx interface{}, name string) error
 type VariableGetHandler func(value *VariableValue, ctx interface{}, name string) error
 
+
+// Variable describles a variable.
+// Name, variable's name, when the variable is unknown, it is the fixed prefix.
+// Set, the set handler, which will be invoked when changeing the variable.
+// Get, the get handler, which will be invoked when getting the variable.
+// Flags, marks the variable type.
 type Variable struct {
     Name   string
     Set    VariableSetHandler
@@ -25,6 +31,10 @@ type Variable struct {
     Flags  uint
 }
 
+// VariableValue describles the variable value.
+// Value, the textual variable value.
+// Cacheable, marks whether the variable can be cached.
+// NotFound, marks whether the variable value is not found.
 type VariableValue struct {
     Value     string
     Cacheable bool
@@ -35,7 +45,7 @@ type VariableValue struct {
 func (corgi *Corgi) validUnknownVariable(name string) *Variable {
     for prefix, variable := range corgi.unknowns {
 
-        /* FIXME implements with a more effective way(like trie?) */
+        // FIXME implements with a more effective way(like trie?)
         if strings.HasPrefix(name, prefix) == true {
             return variable
         }
@@ -63,7 +73,7 @@ func (corgi *Corgi) variableGet(name string) (string, error) {
 
     if (variable.Flags & VARIABLE_NO_CACHEABLE) == 0 {
         if value, ok := corgi.caches[name]; ok == true {
-            /* hits the cache */
+            // hits the cache
             if value.NotFound == true {
                 return "", fmt.Errorf("vlaue of variable \"%s\" not found",
                 name)
@@ -91,6 +101,9 @@ func (corgi *Corgi) variableGet(name string) (string, error) {
 }
 
 
+// RegisterNewVariable Registers a new variable.
+// The unique param is the variable that caller wants to register.
+// In case of failure, a corresponding error object will be yielded.
 func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
     var name string = variable.Name
 
@@ -100,7 +113,7 @@ func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
             return fmt.Errorf("variable \"%s\" already exists", name)
         }
 
-        /* flushes the cache */
+        // flushes the cache
         delete(corgi.caches, name)
 
         if variable.Flags & VARIABLE_UNKNOWN == 0 {
@@ -114,7 +127,7 @@ func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
         return nil
     }
 
-    /* name is actually the prefix */
+    // name is actually the prefix
     if oldVariable, ok := corgi.unknowns[name]; ok == true {
 
         if oldVariable.Flags & VARIABLE_CHANGEABLE == 0 {
@@ -123,10 +136,10 @@ func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
 
         for key, _ := range corgi.caches {
 
-            /* FIXME implements with a more effective way */
+            // FIXME implements with a more effective way
             if strings.HasPrefix(key, name) == true {
 
-                /* flushes the cache */
+                // flushes the cache
                 delete(corgi.caches, key)
             }
         }
@@ -153,6 +166,8 @@ func (corgi *Corgi) RegisterNewVariable(variable *Variable) error {
 }
 
 
+// RegisterNewVariable Registers a group of variables, this method is just the
+// wrapper of Corgi.RegisterNewVariable.
 func (corgi *Corgi) RegisterNewVariables(variables []*Variable) error {
     var err error
 

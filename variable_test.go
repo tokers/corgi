@@ -1,4 +1,4 @@
-/* Copyright (C) Alex Zhang */
+// Copyright (C) Alex Zhang
 
 package corgi
 
@@ -196,7 +196,7 @@ func testVariableRegister(t *testing.T) {
         t.Fatalf("unknown failure reason: %s", err.Error())
     }
 
-    /* the old "nil" is known, replaces it with the unknown one */
+    // the old "nil" is known, replaces it with the unknown one
     err = c.RegisterNewVariable(&Variable {
         Name : "nil",
         Get : variableGet,
@@ -207,7 +207,7 @@ func testVariableRegister(t *testing.T) {
         t.Fatalf("failed to register variable \"nil\": %s", err.Error())
     }
 
-    /* the old "nil" is unknown, replaces it with the known one */
+    // the old "nil" is unknown, replaces it with the known one
     err = c.RegisterNewVariable(&Variable {
         Name : "nil",
         Get : variableGet,
@@ -364,7 +364,7 @@ func testVariableValueNotFound(t *testing.T) {
             t.Fatalf("unknown failure reason: %s", err.Error())
         }
 
-        /* not found from the cache */
+        // not found from the cache
         if _, err := c.Code(cv); err == nil {
             t.Fatal("unexpected successful parsing")
 
@@ -386,7 +386,7 @@ func testVariableValueNotFound(t *testing.T) {
             t.Fatalf("unknown failure reason: %s", err.Error())
         }
 
-        /* not found from the cache */
+        // not found from the cache
         if _, err := c.Code(cv); err == nil {
             t.Fatal("unexpected successful parsing")
 

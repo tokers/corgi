@@ -62,7 +62,7 @@ func getMyVar(value *corgi.VariableValue, _ interface{}, name string) error {
         value.Cacheable = true
 
     } else {
-        value.NotFound = true /* not found this */
+        value.NotFound = true // not found this
         value.Cacheable = false
     }
 

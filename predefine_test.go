@@ -1,4 +1,4 @@
-/* Copyright (C) Alex Zhang */
+// Copyright (C) Alex Zhang
 
 package corgi
 
@@ -80,7 +80,7 @@ func testTime(t *testing.T, c *Corgi) {
         t.Fatalf("failed to convert $second to integer: %s", err.Error())
     }
 
-    /* we assume that the second value is correct */
+    // we assume that the second value is correct
 
     realZone, _ := now.Zone()
 

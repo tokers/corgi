@@ -1,4 +1,4 @@
-/* Copyright (C) Alex Zhang */
+// Copyright (C) Alex Zhang
 
 package corgi
 
