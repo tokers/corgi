@@ -1,5 +1,6 @@
 // Copyright (C) Alex Zhang
 
+// Package corgi does the variables interpolation job.
 package corgi
 
 
