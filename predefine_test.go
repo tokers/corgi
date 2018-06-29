@@ -89,6 +89,17 @@ func testTime(t *testing.T, c *Corgi) {
         t.Fatalf("incorrect zone, expected \"%s\" but seen \"%s\"", realZone,
                  zone)
     }
+
+    t1 := time.Now().Unix()
+    data = parse(t, c, "${time}")
+    t2, err := strconv.ParseInt(data, 10, 64)
+    if err != nil {
+        t.Fatalf("invalid ${time} value: %s", data)
+    }
+
+    if t1 - t2 >= 1 || t2 - t1 >= 1 {
+        t.Fatalf("incorrect time, expected \"%d\" but seen \"%d\"", t1, t2)
+    }
 }
 
 

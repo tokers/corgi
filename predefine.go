@@ -83,6 +83,12 @@ var predefineVariables []*Variable = []*Variable {
     },
 
     &Variable {
+        Name  : "time",
+        Get   : predefineVariableTime,
+        Flags : VARIABLE_CHANGEABLE,
+    },
+
+    &Variable {
         Name  : "env_",
         Get   : predefineVariableENV,
         Flags : VARIABLE_UNKNOWN,
@@ -95,6 +101,11 @@ func predefineVariableTime(value *VariableValue, _ interface{}, component string
 
     value.NotFound = false
     value.Cacheable = false
+
+    if component == "time" {
+        value.Value = strconv.FormatInt(now.Unix(), 10)
+        return nil
+    }
 
     if component == "year" {
         value.Value = strconv.Itoa(now.Year())
