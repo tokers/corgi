@@ -81,16 +81,12 @@ func (cv *ComplexValue) append(name string, variable bool) error {
             return fmt.Errorf("too large capture group number: \"%d\"", n)
         }
 
-        if _, ok := cv.corgi.captures[n]; ok == false {
-            cv.code = append(cv.code, scriptCode {
-                kind: SCRIPT_CAPTURE,
-                data: name,
-            })
+        cv.code = append(cv.code, scriptCode {
+            kind: SCRIPT_CAPTURE,
+            data: name,
+        })
 
-            cv.size++
-
-            cv.corgi.captures[n] = true
-        }
+        cv.size++
 
         return nil
     }
