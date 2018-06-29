@@ -6,6 +6,7 @@ import (
     "fmt"
     "bytes"
     "errors"
+    "strconv"
 )
 
 
@@ -20,6 +21,7 @@ const (
 
     SCRIPT_PLAIN = iota
     SCRIPT_VARIABLE
+    SCRIPT_CAPTURE
 )
 
 
@@ -71,6 +73,27 @@ func (cv *ComplexValue) append(name string, variable bool) error {
     }
 
     // this is a variable
+
+    if n, err := strconv.Atoi(name); err == nil {
+        // we treat numeric name as the regular expression capture group number
+
+        if n > 99 {
+            return fmt.Errorf("too large capture group number: \"%d\"", n)
+        }
+
+        if _, ok := cv.corgi.captures[n]; ok == false {
+            cv.code = append(cv.code, scriptCode {
+                kind: SCRIPT_CAPTURE,
+                data: name,
+            })
+
+            cv.size++
+
+            cv.corgi.captures[n] = true
+        }
+
+        return nil
+    }
 
     if _, ok := cv.corgi.variables[name]; ok == false {
 
@@ -213,7 +236,34 @@ func (corgi *Corgi) Code(cv *ComplexValue) (string, error) {
         pos++
 
         if code.kind == SCRIPT_PLAIN {
-            buffer.WriteString(code.data)
+            if n, err := buffer.WriteString(code.data); err != nil {
+                return "", err
+
+            } else if n != len(code.data) {
+                return "", errors.New("incomplete written operation")
+            }
+
+            continue
+        }
+
+        if code.kind == SCRIPT_CAPTURE {
+            if corgi.Group == nil {
+                return "", errors.New("empty capture group")
+            }
+
+            n, _ := strconv.Atoi(code.data)
+            if n >= len(corgi.Group) {
+                return "", errors.New("too large capture number")
+
+            } else {
+                if c, err := buffer.WriteString(corgi.Group[n]); err != nil {
+                    return "", err
+
+                } else if c != len(corgi.Group[n]) {
+                    return "", errors.New("incomplete written operation")
+                }
+            }
+
             continue
         }
 

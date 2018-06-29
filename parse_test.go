@@ -5,6 +5,7 @@ package corgi
 import (
     "os"
     "fmt"
+    "regexp"
     "testing"
 )
 
@@ -115,7 +116,48 @@ func testParseComplex(t *testing.T) {
 }
 
 
+func testParseCapture(t *testing.T) {
+    c, err := New()
+    if err != nil {
+        t.Fatal("failed to create corgi instance failed")
+    }
+
+    pattern := "(\\d+) sheep in (.*)"
+    raw := "1234 sheep in The North Pole"
+
+    regex := regexp.MustCompile(pattern)
+
+    group := regex.FindStringSubmatch(raw)
+
+    text := `Hello, there are $1 sheep in ${2}, Host is $hostname`
+
+    cv, err := c.Parse(text)
+    if err != nil {
+        t.Fatal(err.Error())
+    }
+
+    hostname, err := os.Hostname()
+    if err != nil {
+        t.Fatalf("failed to get hostname: %s", err.Error())
+    }
+
+    expected := fmt.Sprintf("Hello, there are %s sheep in %s, Host is %s",
+                            group[1], group[2], hostname)
+
+    c.Group = group
+
+    if plain, err := c.Code(cv); err != nil {
+        t.Fatal(err.Error())
+
+    } else if plain != expected {
+        t.Fatalf("incorrect value, expected \"%s\" but seen \"%s\"", expected,
+                 plain)
+    }
+}
+
+
 func TestParse(t *testing.T) {
     testParseFailed(t)
     testParseComplex(t)
+    testParseCapture(t)
 }
